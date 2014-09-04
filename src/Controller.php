@@ -66,7 +66,11 @@ class Controller {
       $this->log("Dry Execute: " . $command);
     } else {
       $this->log("Execute: " . $command);
-      $this->log(exec($command));
+      $data = array();
+      exec($command,$data);
+      foreach($data as $out) {
+        $this->log($out);
+      }
     }
   }
 }
