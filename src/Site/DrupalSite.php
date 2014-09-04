@@ -20,18 +20,22 @@ class DrupalSite extends Site implements Testable {
     return $command;
   }
 
+  private function getProfilePath($next = '') {
+    return $this->getPath('/profiles/'.$this->install['profile'].$next);
+  }
+
   public function backup() {
     $this->drush(sprintf('sql-dump > "%s"',$this->getBackupFile()));
   }
 
   public function checkout() {
-    $this->controller->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getPath()));
+    $this->controller->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getProfilePath()));
   }
 
   public function install() {
     $this->controller->execute('chmod -R a+w ' . $this->getPath('/sites/default'));
     $this->controller->execute('rm ' . $this->getPath('/sites/default/settings.php'));
-    $this->controller->execute('cd ' . $this->getPath() . ' && ' . $this->drush(sprintf('make %s -y',$this->getPath('/profiles/'.$this->install['profile'].'/'.$this->install['makefile'])),FALSE));
+    $this->controller->execute('cd ' . $this->getPath() . ' && ' . $this->drush(sprintf('make %s -y',$this->getProfilePath('/'.$this->install['makefile'])),FALSE));
     $this->drush(implode(' ', array(
       'site-install',
       $this->install['profile'],
@@ -41,7 +45,7 @@ class DrupalSite extends Site implements Testable {
       sprintf('--account-mail="%s"',$this->install['user']['mail']),
       sprintf('--site-mail="%s"',$this->install['mail']),
       sprintf('--site-name="%s"',$this->getName()),
-      sprintf('--db-url="mysql://%s:%s@%s/%s',$this->install['database']['username'],$this->install['database']['password'],$this->install['database']['host'],$this->install['database']['schema'])
+      sprintf('--db-url="mysql://%s:%s@%s/%s"',$this->install['database']['username'],$this->install['database']['password'],$this->install['database']['host'],$this->install['database']['schema'])
     )));
     $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default'));
     $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default/settings.php'));
