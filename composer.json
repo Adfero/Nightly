@@ -1,0 +1,9 @@
+{
+    "require": {
+        "phpmailer/phpmailer": "*",
+        "nategood/commando": "*"
+    },
+    "autoload": {
+        "psr-4": {"Adfero\\": "src/"}
+    }
+}
