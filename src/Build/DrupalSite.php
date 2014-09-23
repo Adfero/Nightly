@@ -49,7 +49,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   }
 
   protected function _verifyInstall() {
-    $files = xml_files($this->xml_dir);
+    $files = $this->getXMLFiles();
     foreach($files as $xml_file) {
       if (!$this->verifyXml($this->xml_dir.'/'.$xml_file)) {
         return false;
@@ -71,7 +71,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   }
 
   private function generateMergedXMLDocument() {
-    $files = xml_files($this->xml_dir);
+    $files = $this->getXMLFiles();
     $new_document = new DOMDocument();
     $new_document->loadXML('<?xml version="1.0"?><testsuite></testsuite>');
     foreach($files as $xml_file) {
