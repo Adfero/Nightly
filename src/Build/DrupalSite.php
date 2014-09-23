@@ -43,7 +43,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
 
   public function test() {
     $this->xml_dir = $this->controller->generateTempDirectory();
-    $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']);
+    $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']));
     $xml_file = $this->generateMergedXMLDocument();
     $this->saveArtifact('Test_Results.xml',$xml_file);
   }
