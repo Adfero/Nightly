@@ -21,13 +21,6 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
     $this->controller->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getProfilePath()));
   }
 
-  public function test() {
-    $this->xml_dir = $this->controller->generateTempDirectory();
-    $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']);
-    $xml_file = $this->generateMergedXMLDocument();
-    $this->saveArtifact('Test_Results.xml',$xml_file);
-  }
-
   public function install() {
     $this->controller->execute('chmod -R a+w ' . $this->getPath('/sites/default'));
     $this->controller->execute('rm ' . $this->getPath('/sites/default/settings.php'));
@@ -46,6 +39,13 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
     )));
     $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default'));
     $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default/settings.php'));
+  }
+
+  public function test() {
+    $this->xml_dir = $this->controller->generateTempDirectory();
+    $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']);
+    $xml_file = $this->generateMergedXMLDocument();
+    $this->saveArtifact('Test_Results.xml',$xml_file);
   }
 
   protected function _verifyInstall() {
