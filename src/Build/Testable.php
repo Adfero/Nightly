@@ -1,6 +1,6 @@
 <?php
 
-namespace Adfero\Site;
+namespace Adfero\Build;
 
 interface Testable {
   public function test();
