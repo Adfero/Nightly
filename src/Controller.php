@@ -58,7 +58,7 @@ class Controller {
     }
     $name = md5(time().'-'.rand());
     $path = sprintf('%s/%s.%s',$tmp_dir,$name,$extension);
-    $this->temp_files[] = $path
+    $this->temp_files[] = $path;
     return $path;
   }
 
