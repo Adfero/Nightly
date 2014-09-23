@@ -72,7 +72,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
 
   private function generateMergedXMLDocument() {
     $files = $this->getXMLFiles();
-    $new_document = new DOMDocument();
+    $new_document = new \DOMDocument();
     $new_document->loadXML('<?xml version="1.0"?><testsuite></testsuite>');
     foreach($files as $xml_file) {
       $this->importTestcases($this->xml_dir.'/'.$xml_file,$new_document);
@@ -85,7 +85,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
 
   private function importTestcases($xml_file,$new_document) {
     $xml_string = file_get_contents($xml_file);
-    $testsuite = new DOMDocument();
+    $testsuite = new \DOMDocument();
     $testsuite->loadXML($xml_string);
     $testcases = $testsuite->getElementsByTagName('testcase');
     foreach ($testcases as $testcase) {
@@ -107,7 +107,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
 
   private function verifyXml($file) {
     $xml_string = file_get_contents($file);
-    $testsuite = new SimpleXMLElement($xml_string);
+    $testsuite = new \SimpleXMLElement($xml_string);
     foreach($testsuite as $testcase) {
       if (property_exists($testcase, 'failure')) {
         return false;
