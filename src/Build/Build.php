@@ -50,7 +50,7 @@ abstract class Build {
   public function constructEmail(\PHPMailer $email) {
     $email->Subject = sprintf('%@ Build Results',$this->name);
     $email->Body = sprintf('<h1>%@ Build Results</h1>',$this->name);
-    $email->body .= sprintf('<p>Status: <strong style="color: %s;">%s</strong></p>',$this->successful_build ? 'green' : 'red',$this->successful_build ? 'Pass' : 'Fail');
+    $email->Body .= sprintf('<p>Status: <strong style="color: %s;">%s</strong></p>',$this->successful_build ? 'green' : 'red',$this->successful_build ? 'Pass' : 'Fail');
     foreach($this->artifacts as $name => $file) {
       $email->addAttachment($file,$name);
     }
