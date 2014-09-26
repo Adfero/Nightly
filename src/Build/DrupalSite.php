@@ -45,8 +45,11 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
     $this->drush('en -y simpletest');
     $this->xml_dir = $this->controller->generateTempDirectory();
     $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']));
-    $xml_file = $this->generateMergedXMLDocument();
-    $this->saveArtifact('Test_Results.xml',$xml_file);
+  }
+
+  public function constructEmail(\PHPMailer $email) {
+    parent::constructEmail($email);
+    $email->Body .= $this->generateTestHTML();
   }
 
   protected function _verifyInstall() {
@@ -93,6 +96,50 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
       $new_node = $new_document->importNode($testcase,true);
       $new_document->documentElement->appendChild($new_node);
     }
+  }
+
+  private function generateTestHTML() {
+    $files = scandir($this->xml_dir);
+    $sections = array();
+    foreach($files as $file) {
+      if (strpos($file, '.xml') !== FALSE) {
+        $sections[$file] = array(
+          'name' => $file,
+          'pass' => true,
+          'tests' => array()
+        );
+        $xml_string = file_get_contents($this->xml_dir.'/'.$file);
+        $testsuite = new \SimpleXMLElement($xml_string);
+        foreach($testsuite->testcase as $testcase) {
+          $sections[$file]['name'] = (string)$testcase['classname'];
+          $test = array(
+            'name' => (string)$testcase['name'],
+            'pass' => true,
+            'details' => ''
+          );
+          if ($testcase->failure) {
+            $sections[$file]['pass'] = $test['pass'] = false;
+            $test['details'] = (string)$testcase->failure;
+          }
+          $sections[$file]['tests'][(string)$testcase['name']] = $test;
+        }
+      }
+    }
+
+    $html = '';
+    foreach($sections as $section) {
+      $html .= sprintf('<h2>%s: <span style="color: %s;">%s</span></h2>',$section['name'],$section['pass'] ? 'green' : 'red',$section['pass'] ? 'Pass' : 'Fail');
+      $html .= '<table border="1" cellpadding="3" width="100%"><thead><th width="25%">Test</th><th width="25%">Status</th><th width="50%">Details</th></thead><tbody>';
+      foreach($section['tests'] as $test) {
+        $html .= sprintf('<tr style="background: %s;">',$test['pass'] ? 'green' : 'red');
+        $html .= sprintf('<td>%s</td>',$test['name']);
+        $html .= sprintf('<td>%s</td>',$test['pass'] ? 'Pass' : 'Fail');
+        $html .= sprintf('<td>%s</td>',$test['details']);
+        $html .= '</tr>';
+      }
+      $html .= '</tbody></table>';
+    }
+    return $html;
   }
 
   private function getXMLFiles() {

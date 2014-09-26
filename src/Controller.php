@@ -92,6 +92,7 @@ class Controller {
       }
     }
   }
+  //TODO cleanup tmp files
 
   private function executeBuild(\Adfero\Build\Build $build) {
     if ($build instanceof \Adfero\Build\Backupable) {
