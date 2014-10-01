@@ -7,8 +7,8 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   protected $test;
   protected $xml_dir;
 
-  public function __construct(\Adfero\Controller $controller, array $config) {
-    parent::__construct($controller,$config);
+  public function __construct(\Adfero\Controller $controller, array $config, $dry_run) {
+    parent::__construct($controller,$config,$dry_run);
     $this->install = $config['install'];
     $this->test = $config['test'];
   }
