@@ -85,7 +85,7 @@ class Controller {
 
   public function run() {
     foreach($this->config['builds'] as $build_config) {
-      $build = new $build_config['type']($this,$build_config);
+      $build = new $build_config['type']($this,$build_config,$this->dry_run);
       if ($build && $build instanceof \Adfero\Build\Build) {
         $build->run();
         $this->emailBuild($build);

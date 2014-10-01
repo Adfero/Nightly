@@ -10,8 +10,9 @@ abstract class Build {
   protected $successful_build;
   private $artifacts;
   private $log;
+  private $dry_run;
 
-  public function __construct(\Adfero\Controller $controller, array $config) {
+  public function __construct(\Adfero\Controller $controller, array $config, $dry_run) {
     $this->controller = $controller;
     $this->slug = $config['slug'];
     $this->name = $config['name'];
@@ -19,6 +20,7 @@ abstract class Build {
     $this->artifacts = array();
     $this->successful_build = true;
     $this->log = '';
+    $this->dry_run = $dry_run;
   }
 
   public function run() {
