@@ -82,7 +82,7 @@ abstract class Build {
 
   protected function log($message) {
     $this->controller->log($message);
-    $this->log .= $message;
+    $this->log .= $message . "\n";
   }
 
   protected function execute($command) {
