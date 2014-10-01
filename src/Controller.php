@@ -87,26 +87,12 @@ class Controller {
     foreach($this->config['builds'] as $build_config) {
       $build = new $build_config['type']($this,$build_config);
       if ($build && $build instanceof \Adfero\Build\Build) {
-        $this->executeBuild($build);
+        $build->run();
         $this->emailBuild($build);
       }
     }
   }
   //TODO cleanup tmp files
-
-  private function executeBuild(\Adfero\Build\Build $build) {
-    if ($build instanceof \Adfero\Build\Backupable) {
-      $build->backup();
-    }
-    if ($build instanceof \Adfero\Build\Checkoutable) {
-      $build->checkout();
-    }
-    $build->install();
-    if ($build instanceof \Adfero\Build\Testable) {
-      $build->test();
-    }
-    $build->verifyInstall();
-  }
 
   private function emailBuild(\Adfero\Build\Build $build) {
     $mail = new \PHPMailer;
@@ -130,18 +116,5 @@ class Controller {
 
   public function log($message) {
     echo $message."\n";
-  }
-
-  public function execute($command) {
-    if ($this->dry_run) {
-      $this->log("Dry Execute: " . $command);
-    } else {
-      $this->log("Execute: " . $command);
-      $data = array();
-      exec($command,$data);
-      foreach($data as $out) {
-        $this->log($out);
-      }
-    }
   }
 }

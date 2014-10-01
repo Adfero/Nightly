@@ -18,13 +18,13 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   }
 
   public function checkout() {
-    $this->controller->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getProfilePath()));
+    $this->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getProfilePath()));
   }
 
   public function install() {
-    $this->controller->execute('chmod -R a+w ' . $this->getPath('/sites/default'));
-    $this->controller->execute('rm ' . $this->getPath('/sites/default/settings.php'));
-    $this->controller->execute('cd ' . $this->getPath() . ' && ' . $this->drush(sprintf('make %s -y',$this->getProfilePath('/'.$this->install['makefile'])),FALSE));
+    $this->execute('chmod -R a+w ' . $this->getPath('/sites/default'));
+    $this->execute('rm ' . $this->getPath('/sites/default/settings.php'));
+    $this->execute('cd ' . $this->getPath() . ' && ' . $this->drush(sprintf('make %s -y',$this->getProfilePath('/'.$this->install['makefile'])),FALSE));
     $this->drush(implode(' ', array(
       'site-install',
       $this->install['profile'],
@@ -37,19 +37,14 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
       sprintf('--site-name="%s"',$this->getName()),
       sprintf('--db-url="mysql://%s:%s@%s/%s"',$this->install['database']['username'],$this->install['database']['password'],$this->install['database']['host'],$this->install['database']['schema'])
     )));
-    $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default'));
-    $this->controller->execute('chmod a-w ' . $this->getPath('/sites/default/settings.php'));
+    $this->execute('chmod a-w ' . $this->getPath('/sites/default'));
+    $this->execute('chmod a-w ' . $this->getPath('/sites/default/settings.php'));
   }
 
   public function test() {
     $this->drush('en -y simpletest');
     $this->xml_dir = $this->controller->generateTempDirectory();
-    $this->controller->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']));
-  }
-
-  public function constructEmail(\PHPMailer $email) {
-    parent::constructEmail($email);
-    $email->Body .= $this->generateTestHTML();
+    $this->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']));
   }
 
   protected function _verifyInstall() {
@@ -62,10 +57,14 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
     return true;
   }
 
+  public function generateTestResultsHTML() {
+    return $this->generateTestHTML();
+  }
+
   private function drush($command,$exec = true) {
     $command = sprintf('drush --root="%s" %s',$this->getPath(),$command);
     if ($exec) {
-      $this->controller->execute($command);
+      $this->execute($command);
     }
     return $command;
   }

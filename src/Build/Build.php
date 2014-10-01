@@ -9,6 +9,7 @@ abstract class Build {
   protected $path;
   protected $successful_build;
   private $artifacts;
+  private $log;
 
   public function __construct(\Adfero\Controller $controller, array $config) {
     $this->controller = $controller;
@@ -17,6 +18,21 @@ abstract class Build {
     $this->path = $config['path'];
     $this->artifacts = array();
     $this->successful_build = true;
+    $this->log = '';
+  }
+
+  public function run() {
+    if ($this instanceof \Adfero\Build\Backupable) {
+      $this->backup();
+    }
+    if ($this instanceof \Adfero\Build\Checkoutable) {
+      $this->checkout();
+    }
+    $this->install();
+    if ($this instanceof \Adfero\Build\Testable) {
+      $this->test();
+    }
+    $this->verifyInstall();
   }
 
   public function getName() {
@@ -51,8 +67,36 @@ abstract class Build {
     $email->Subject = sprintf('%s Build Results',$this->name);
     $email->Body = sprintf('<h1>%s Build Results</h1>',$this->name);
     $email->Body .= sprintf('<p>Status: <strong style="color: %s;">%s</strong></p>',$this->successful_build ? 'green' : 'red',$this->successful_build ? 'Pass' : 'Fail');
+    if ($this instanceof Testable) {
+      $email->Body .= $this->generateTestResultsHTML();
+    }
     foreach($this->artifacts as $name => $file) {
       $email->addAttachment($file,$name);
+    }
+    $logfile = $this->controller->generateTempFile('log');
+    file_put_contents($logfile, $this->log);
+    $email->addAttachment($logfile,'build.log');
+  }
+
+  protected function log($message) {
+    $this->controller->log($message);
+    $this->log .= $message;
+  }
+
+  protected function execute($command) {
+    if ($this->dry_run) {
+      $this->log("Dry Execute: " . $command);
+    } else {
+      $this->log("Execute: " . $command);
+      $data = array();
+      $return_var = 0;
+      exec($command,$data,$return_var);
+      foreach($data as $out) {
+        $this->log($out);
+      }
+      if ($return_var != 0) {
+        $this->log('Command failed with error: '.$return_var);
+      }
     }
   }
   
