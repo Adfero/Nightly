@@ -44,7 +44,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   public function test() {
     $this->drush('en -y simpletest');
     $this->xml_dir = $this->controller->generateTempDirectory();
-    $this->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --url %s --xml %s %s',$this->getPath(),$this->test['url'],$this->xml_dir,$this->test['category']));
+    $this->execute(sprintf('cd %s && php scripts/run-tests.sh --verbose --php %s --url %s --xml %s %s',$this->getPath(),$this->test['php'],$this->test['url'],$this->xml_dir,$this->test['category']));
   }
 
   protected function _verifyInstall() {
