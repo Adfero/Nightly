@@ -62,7 +62,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   }
 
   private function drush($command,$exec = true) {
-    $command = sprintf('drush --root="%s" %s',$this->getPath(),$command);
+    $command = sprintf($this->config['drush_path'].' --root="%s" %s',$this->getPath(),$command);
     if ($exec) {
       $this->execute($command);
     }

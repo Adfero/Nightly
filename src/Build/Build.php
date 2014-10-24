@@ -8,6 +8,7 @@ abstract class Build {
   protected $name;
   protected $path;
   protected $successful_build;
+  protected $config;
   private $artifacts;
   private $log;
   private $dry_run;
@@ -17,6 +18,7 @@ abstract class Build {
     $this->slug = $config['slug'];
     $this->name = $config['name'];
     $this->path = $config['path'];
+    $this->config = $config;
     $this->artifacts = array();
     $this->successful_build = true;
     $this->log = '';
