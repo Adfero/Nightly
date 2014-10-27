@@ -18,7 +18,7 @@ class DrupalSite extends Build implements Checkoutable, Testable, Backupable {
   }
 
   public function checkout() {
-    $this->execute(sprintf('cd %s && git fetch && git merge origin/master',$this->getProfilePath()));
+    $this->execute(sprintf('cd %s && git fetch && git merge origin/%s',$this->getProfilePath(),$this->install['branch']));
   }
 
   public function install() {
