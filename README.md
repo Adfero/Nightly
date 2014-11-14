@@ -4,11 +4,7 @@ This is a sort of CI/Nightly build engine written in PHP. Rather than configure 
 
 ## To-do
 
-* Test runner over and for Drupal
-* Artifact generation
-* Backup file assignment
-* Email notifications
-* Build completeness check
 * exec() error checking
 * Plugin file architecture
 * Config file validation
+* Temp file cleanup
